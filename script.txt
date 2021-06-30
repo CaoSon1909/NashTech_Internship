@@ -1,0 +1,98 @@
+--INSERT INTO public.tbl_food
+--(uuid)
+--VALUES('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
+
+create table tbl_Role(
+	id integer primary key not null,
+	role_name varchar(50) not null,
+	role_description text
+);
+
+create table tbl_User(
+	email varchar(320) not null,
+	passsword varchar(30) not null,
+	fullname varchar(150) not null,
+	address text,
+	phone_number varchar(13),
+	date_of_birth date,
+	gender integer not null,
+	status integer not null,
+	role_id integer,
+	
+	primary key (email),
+	constraint fk_role_id foreign key (role_id) references tbl_Role(id)
+);
+
+
+create table tbl_Category(
+	id int not null,
+	name varchar(50) not null,
+	description text,
+
+	primary key (id)
+);
+
+create table tbl_Food(
+	uuid UUID not null,
+	food_name varchar(150) not null,
+	food_description text,
+	price float not null,
+	create_date date not null,
+	update_date date,
+	quantity int not null,
+	category_id int,
+	status int not null,
+	
+	primary key (uuid),
+	constraint fk_category_id foreign key (category_id) references tbl_Category(id)
+);
+
+--drop table tbl_PaymentType
+
+create table tbl_PaymentType(
+	id int not null,
+	name varchar(50) not null,
+	description text,
+	
+	primary key (id)
+);
+
+create table tbl_Order(
+	uuid UUID not null,
+	delivery_address text not null,
+	total float not null,
+	order_date date not null,
+	status int not null,
+	user_email varchar(320),
+	payment_type_id int,
+	
+	primary key (uuid),
+	constraint fk_email foreign key (user_email) references tbl_User(email),
+	constraint fk_payment_type_id foreign key (payment_type_id) references tbl_PaymentType(id)
+);
+
+create table tbl_OrderDetail(
+	uuid UUID not null,
+	order_id uuid,
+	food_id uuid,
+	quantity int not null,
+	price float not null,
+	
+	primary key (uuid),
+	constraint fk_order_id foreign key (order_id) references tbl_Order(uuid),
+	constraint fk_food_id foreign key (food_id) references tbl_Food(uuid)
+
+);
+
+create table tbl_CartDetail(
+	uuid uuid not null,
+	user_email varchar(320),
+	food_id uuid,
+	quantity int not null,
+	price float not null,
+	
+	primary key (uuid),
+	constraint fk_email foreign key (user_email) references tbl_User(email),
+	constraint fk_food_id foreign key (food_id) references tbl_Food(uuid)
+);
+
