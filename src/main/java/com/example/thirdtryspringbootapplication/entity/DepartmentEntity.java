@@ -1,10 +1,20 @@
 package com.example.thirdtryspringbootapplication.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "tblDepartment")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class DepartmentEntity {
     @Id
     @Column(name = "depID", updatable = false, unique = true, nullable = false)
@@ -13,13 +23,15 @@ public class DepartmentEntity {
     private String name;
     @Column(name = "depAddress")
     private String address;
-    @OneToMany(targetEntity = EmployeeEntity.class, mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<EmployeeEntity> employees;
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(nullable = true)
+    @JsonManagedReference
+    private Set<EmployeeEntity> employees = new HashSet<>();
 
     public DepartmentEntity() {
     }
 
-    public DepartmentEntity(int id, String name, String address, List<EmployeeEntity> employees) {
+    public DepartmentEntity(int id, String name, String address, Set<EmployeeEntity> employees) {
         this.id = id;
         this.name = name;
         this.address = address;
@@ -50,11 +62,11 @@ public class DepartmentEntity {
         this.address = address;
     }
 
-    public List<EmployeeEntity> getEmployees() {
+    public Set<EmployeeEntity> getEmployees() {
         return employees;
     }
 
-    public void setEmployees(List<EmployeeEntity> employees) {
+    public void setEmployees(Set<EmployeeEntity> employees) {
         this.employees = employees;
     }
 }

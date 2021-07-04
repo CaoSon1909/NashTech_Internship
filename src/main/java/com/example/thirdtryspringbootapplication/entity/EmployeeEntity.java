@@ -1,5 +1,9 @@
 package com.example.thirdtryspringbootapplication.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import javax.persistence.*;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -23,7 +27,8 @@ public class EmployeeEntity {
     @Column(name = "empBirthdate", nullable = false)
     private LocalTime birthDate;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "depID", referencedColumnName = "depID")
+    @JoinColumn(name = "depID")
+    @JsonBackReference
     private DepartmentEntity department;
 
     public EmployeeEntity() {
@@ -94,4 +99,5 @@ public class EmployeeEntity {
     public void setDepartment(DepartmentEntity department) {
         this.department = department;
     }
+
 }

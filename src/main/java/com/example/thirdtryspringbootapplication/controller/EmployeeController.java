@@ -34,7 +34,7 @@ public class EmployeeController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/alll")
+    @GetMapping("/all")
     public ResponseEntity<List<EmployeeEntity>> getEmployees(){
         List<EmployeeEntity> result = (List<EmployeeEntity>) StreamSupport
                 .stream(service.findAllEmployee().spliterator(), false)
@@ -44,7 +44,7 @@ public class EmployeeController {
                 : new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
+    @GetMapping(value = "/id/{id}")
     public ResponseEntity<EmployeeEntity> getEmployeeByID(@PathVariable("id") UUID uuid){
         Optional<EmployeeEntity> opt = service.findEmployeeByUUID(uuid);
         return opt.isPresent()
@@ -52,7 +52,7 @@ public class EmployeeController {
                 : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("{name}")
+    @GetMapping(value = "/name/{name}")
     public ResponseEntity<List<EmployeeEntity>> getEmployeeLikeName(@PathVariable("name") String name){
         Optional<EmployeeEntity> opt = service.findEmployeeByName(name);
         return opt.isPresent()
@@ -67,7 +67,7 @@ public class EmployeeController {
                 : new ResponseEntity<>("Update Fail", HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping(path ="{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") UUID uuid){
         return service.deleteEmployee(uuid) > 0
                 ? new ResponseEntity<>("Deleted", HttpStatus.OK)
