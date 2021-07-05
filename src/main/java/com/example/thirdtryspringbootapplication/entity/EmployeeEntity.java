@@ -1,19 +1,19 @@
 package com.example.thirdtryspringbootapplication.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tblEmployee")
-public class EmployeeEntity {
+public class EmployeeEntity implements Serializable {
 
     @Id
-    @GeneratedValue
     @Column(name = "empID",updatable = false, unique = true,nullable = false)
     private UUID id;
     @Column(name = "empName", length = 50, nullable = false)
@@ -26,10 +26,14 @@ public class EmployeeEntity {
     private char gender;
     @Column(name = "empBirthdate", nullable = false)
     private LocalTime birthDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "depID")
     @JsonBackReference
     private DepartmentEntity department;
+
+    @Column(name = "depID",insertable = false, updatable = false)
+    private int depID;
 
     public EmployeeEntity() {
     }
@@ -42,6 +46,22 @@ public class EmployeeEntity {
         this.gender = gender;
         this.birthDate = birthDate;
         this.department = department;
+    }
+
+    public EmployeeEntity(@JsonProperty("id") UUID id
+            , @JsonProperty("name") String name
+            , @JsonProperty("address") String address
+            , @JsonProperty("salary") float salary
+            , @JsonProperty("gender") char gender
+            , @JsonProperty("birthDate") LocalTime birthDate
+            , @JsonProperty("depID") int depID) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.salary = salary;
+        this.gender = gender;
+        this.birthDate = birthDate;
+        this.depID = depID;
     }
 
     public UUID getId() {
@@ -100,4 +120,11 @@ public class EmployeeEntity {
         this.department = department;
     }
 
+    public int getDepID() {
+        return depID;
+    }
+
+    public void setDepID(int depID) {
+        this.depID = depID;
+    }
 }

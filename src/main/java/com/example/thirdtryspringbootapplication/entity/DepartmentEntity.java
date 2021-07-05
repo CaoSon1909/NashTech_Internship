@@ -6,16 +6,13 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerator;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "tblDepartment")
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
-public class DepartmentEntity {
+public class DepartmentEntity implements Serializable {
     @Id
     @Column(name = "depID", updatable = false, unique = true, nullable = false)
     private int id;
@@ -23,8 +20,8 @@ public class DepartmentEntity {
     private String name;
     @Column(name = "depAddress")
     private String address;
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Column(nullable = true)
+
+    @OneToMany( mappedBy = "department",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private Set<EmployeeEntity> employees = new HashSet<>();
 

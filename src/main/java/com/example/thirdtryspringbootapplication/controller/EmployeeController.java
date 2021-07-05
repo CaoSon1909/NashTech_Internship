@@ -1,5 +1,6 @@
 package com.example.thirdtryspringbootapplication.controller;
 
+import com.example.thirdtryspringbootapplication.dtos.EmployeeDTO;
 import com.example.thirdtryspringbootapplication.entity.EmployeeEntity;
 import com.example.thirdtryspringbootapplication.service.EmployeeService;
 import org.apache.coyote.Response;
@@ -25,6 +26,15 @@ public class EmployeeController {
         this.service = service;
     }
 
+    private UUID isValidUUID(String uuidString){
+        try{
+            return UUID.fromString(uuidString);
+        }
+        catch (IllegalArgumentException ex){
+            return null;
+        }
+    }
+
     @PostMapping
     public ResponseEntity<EmployeeEntity> createEmployee(@RequestBody EmployeeEntity emp){
         int impactedRow = service.createEmployee(emp);
@@ -36,27 +46,30 @@ public class EmployeeController {
 
     @GetMapping("/all")
     public ResponseEntity<List<EmployeeEntity>> getEmployees(){
-        List<EmployeeEntity> result = (List<EmployeeEntity>) StreamSupport
-                .stream(service.findAllEmployee().spliterator(), false)
-                .collect(Collectors.toList());
+        List<EmployeeEntity> result = service.findAllEmployees();
         return result.isEmpty()
                 ? new ResponseEntity<>(null, HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping(value = "/id/{id}")
-    public ResponseEntity<EmployeeEntity> getEmployeeByID(@PathVariable("id") UUID uuid){
-        Optional<EmployeeEntity> opt = service.findEmployeeByUUID(uuid);
-        return opt.isPresent()
-                ? new ResponseEntity<>(opt.get(), HttpStatus.OK)
-                : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    public ResponseEntity<EmployeeEntity> getEmployeeByID(@PathVariable("id") String id){
+        UUID uuid = isValidUUID(id);
+        if (uuid != null){
+            Optional<EmployeeEntity> opt = service.findEmployeeByUUID(uuid);
+            return opt
+                    .map(employeeEntity -> new ResponseEntity<>(employeeEntity, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
     }
 
     @GetMapping(value = "/name/{name}")
     public ResponseEntity<List<EmployeeEntity>> getEmployeeLikeName(@PathVariable("name") String name){
-        Optional<EmployeeEntity> opt = service.findEmployeeByName(name);
-        return opt.isPresent()
-                ? new ResponseEntity<>(Collections.singletonList(opt.get()), HttpStatus.OK)
+        List<EmployeeEntity> opt = service.findEmployeeByName(name);
+        return !opt.isEmpty()
+                ? new ResponseEntity<>(opt, HttpStatus.OK)
                 : new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
@@ -68,12 +81,14 @@ public class EmployeeController {
     }
 
     @DeleteMapping(path ="{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable("id") UUID uuid){
-        return service.deleteEmployee(uuid) > 0
-                ? new ResponseEntity<>("Deleted", HttpStatus.OK)
-                : new ResponseEntity<>("Delete Fail", HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> deleteEmployee(@PathVariable("id") String uuidString){
+        UUID uuid = isValidUUID(uuidString);
+        if (uuid != null){
+            return service.deleteEmployee(uuid) > 0
+                    ? new ResponseEntity<>("Deleted", HttpStatus.OK)
+                    : new ResponseEntity<>("Delete Fail", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>("Delete Fail", HttpStatus.NOT_FOUND);
     }
-
-
 
 }
